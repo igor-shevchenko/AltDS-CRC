@@ -1,0 +1,8 @@
+A program for tracking changes in files on NTFS. It writes CRC-32 checksum to alternative data streams.
+
+Usage
+  Write checksum:
+  adcrc.exe write [file or folder] [optional: -r]
+
+  Check changes:
+  adcrc.exe check [file or folder] [optional: -r]
