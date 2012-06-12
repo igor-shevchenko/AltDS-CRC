@@ -57,10 +57,14 @@ unsigned long FileCRC(char* filename){
     }
 }
 
+char CompareCRC(char* filename, unsigned long crc){
+    return FileCRC(filename) == crc;
+}
+
+
 int main(int argc, char* argv[]){
     setlocale(LC_ALL, "Russian_Russia");
     crc_init();
-    printf("%08lX\n", FileCRC("C:\\0101.txt"));
-    //HandleFolder(argv[1], 1);
+
     return (0);
 }
