@@ -4,6 +4,8 @@
 #include <locale.h>
 #include "crc.h"
 
+const int BUF_SIZE = 1024;
+
 void HandleFolder(char* folder, char recursive){
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
@@ -36,11 +38,29 @@ void HandleFolder(char* folder, char recursive){
     }
 }
 
-int main(int argc, char *argv[]){
+unsigned long FileCRC(char* filename){
+    FILE *F;
+    F = fopen(filename, "rb");
+    if(F != NULL) {
+		unsigned char buf[BUF_SIZE];
+		unsigned long crc = 0;
+		int cnt;
+		do {
+			cnt = fread(buf, 1, BUF_SIZE, F);
+			crc = crc_cycle(crc, buf, cnt);
+		} while(cnt == BUF_SIZE);
+		fclose(F);
+		return crc;
+	} else {
+		printf("Unable to open %s\n", filename);
+        exit(-1);
+    }
+}
+
+int main(int argc, char* argv[]){
     setlocale(LC_ALL, "Russian_Russia");
-    char buf[5];
-    strcpy(buf, "qolo");
-    printf("%08lX\n", crc_cycle(0, buf, 2));
+    crc_init();
+    printf("%08lX\n", FileCRC("C:\\0101.txt"));
     //HandleFolder(argv[1], 1);
     return (0);
 }

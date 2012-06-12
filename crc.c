@@ -17,7 +17,7 @@ void crc_init(){
     }
 }
 
-unsigned long crc_cycle(unsigned long crc32, unsigned char *buf, unsigned int cnt){
+unsigned long crc_cycle(unsigned long crc32, unsigned char* buf, unsigned int cnt){
     crc32=~crc32;
     unsigned int i;
     for(i=0;i<cnt;i++){
