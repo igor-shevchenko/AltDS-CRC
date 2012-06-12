@@ -17,9 +17,9 @@ void crc_init(){
     }
 }
 
-unsigned long crc_cycle(unsigned long crc32, unsigned char *buf, ssize_t cnt){
+unsigned long crc_cycle(unsigned long crc32, unsigned char *buf, unsigned int cnt){
     crc32=~crc32;
-    ssize_t i;
+    unsigned int i;
     for(i=0;i<cnt;i++){
         crc32=crc_table[(crc32^buf[i])&0xff]^(crc32>>8);
     }
