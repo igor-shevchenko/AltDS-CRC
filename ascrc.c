@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
+#include <locale.h>
+#include "crc.h"
 
 void HandleFolder(char* folder, char recursive){
     WIN32_FIND_DATA FindFileData;
@@ -35,6 +37,10 @@ void HandleFolder(char* folder, char recursive){
 }
 
 int main(int argc, char *argv[]){
-    HandleFolder(argv[1], 1);
+    setlocale(LC_ALL, "Russian_Russia");
+    char buf[5];
+    strcpy(buf, "qolo");
+    printf("%08lX\n", crc_cycle(0, buf, 2));
+    //HandleFolder(argv[1], 1);
     return (0);
 }
