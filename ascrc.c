@@ -67,7 +67,6 @@ void WriteCRC(char *filename){
     FILE *F;
     strcpy(streamFilename, filename);
     strcat(streamFilename, APPENDIX);
-    printf("%s", streamFilename);
     F = fopen(streamFilename, "wb");
     if (F != NULL){
         unsigned long crc = FileCRC(filename);
@@ -85,10 +84,35 @@ void WriteCRC(char *filename){
     }
 }
 
+void CheckCRC(char *filename){
+    char streamFilename[MAX_PATH];
+    FILE *F;
+    strcpy(streamFilename, filename);
+    strcat(streamFilename, APPENDIX);
+    F = fopen(streamFilename, "rb");
+    if (F != NULL){
+        unsigned long realCrc = FileCRC(filename);
+        unsigned long crc;
+        int cnt;
+        cnt = fread(&crc, sizeof(crc), 1, F);
+        fclose(F);
+        if (!cnt){
+            printf("%s has no CRC in stream\n", filename);
+        } else {
+            if (crc != realCrc){
+                printf("%s changed\n", filename);
+            }
+        }        
+    } else {
+        printf("%s changed\n", filename);
+        exit(-1);
+    }
+}
+
 int main(int argc, char* argv[]){
     setlocale(LC_ALL, "Russian_Russia");
     crc_init();
-    WriteCRC(argv[1]);
+    CheckCRC(argv[1]);
     //HandleFolder(argv[1], 1);
     return (0);
 }
