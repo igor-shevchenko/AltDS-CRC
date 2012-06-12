@@ -9,6 +9,9 @@ const char APPENDIX[] = ":crc\0";
 const char USAGE[] = "Usage: %s [check|write] [FILENAME|FOLDER] [-r]\n";
 
 void HandleFolder(char *name, char recursive, void (*func)(char *)){
+    /*
+        
+    */
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
     DWORD dwError;
