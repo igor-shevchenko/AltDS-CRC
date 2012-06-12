@@ -7,39 +7,51 @@
 const int BUF_SIZE = 1024;
 const char APPENDIX[5] = ":crc\0";
 
-void HandleFolder(char* folder, char recursive){
+void HandleFolder(char *name, char recursive, void (*func)(char *)){
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
     DWORD dwError;
-    strncat(folder, "\\*", 3);
-    hFind = FindFirstFile(folder, &FindFileData);
-    //printf("%s\n", folder);
+    hFind = FindFirstFile(name, &FindFileData);
     if (hFind == INVALID_HANDLE_VALUE){
-        printf("Invalid file handle. Error is %u\n", GetLastError());
-        exit (-1);
-    } else {
-        do {
-            if (!strcmp(FindFileData.cFileName, ".") || !strcmp(FindFileData.cFileName, ".."))
-                continue;
-            if (recursive && FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-                char nextFolder[MAX_PATH];
-                strncpy(nextFolder, folder, strlen(folder)-1);
-                nextFolder[strlen(folder)-1] = '\0';
-                strcat(nextFolder, FindFileData.cFileName);
-                HandleFolder(nextFolder, 1);
-            }
-            printf("File name is %s\n", FindFileData.cFileName);
-        } while (FindNextFile(hFind, &FindFileData) != 0);
-        dwError = GetLastError();
-        FindClose(hFind);
-        if (dwError != ERROR_NO_MORE_FILES){
-            printf("FindNextFile error. Error is %u\n", dwError);
-            exit(-1);
+        if (hFind == INVALID_HANDLE_VALUE){
+            printf("Invalid file handle. Error is %u\n", GetLastError());
+            exit (-1);
         }
+    }
+    if (! (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
+        func(name);
+        return;
+    }
+    strcat(name, "\\*");
+    hFind = FindFirstFile(name, &FindFileData);
+    if (hFind == INVALID_HANDLE_VALUE){
+        if (hFind == INVALID_HANDLE_VALUE){
+            printf("Invalid file handle. Error is %u\n", GetLastError());
+            exit (-1);
+        }
+    }
+    do {
+        if (!strcmp(FindFileData.cFileName, ".") || !strcmp(FindFileData.cFileName, ".."))
+            continue;
+        char nextName[MAX_PATH];
+        strncpy(nextName, name, strlen(name)-1);
+        nextName[strlen(name)-1] = '\0';
+        strcat(nextName, FindFileData.cFileName);
+        if (recursive && FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+            HandleFolder(nextName, 1, func);
+        } else {
+            func(nextName);
+        }
+    } while (FindNextFile(hFind, &FindFileData) != 0);
+    dwError = GetLastError();
+    FindClose(hFind);
+    if (dwError != ERROR_NO_MORE_FILES){
+        printf("FindNextFile error. Error is %u\n", dwError);
+        exit(-1);
     }
 }
 
-unsigned long FileCRC(char* filename){
+unsigned long FileCRC(char *filename){
     FILE *F;
     F = fopen(filename, "rb");
     if (F != NULL){
@@ -58,7 +70,7 @@ unsigned long FileCRC(char* filename){
     }
 }
 
-char CompareCRC(char* filename, unsigned long crc){
+char CompareCRC(char *filename, unsigned long crc){
     return FileCRC(filename) == crc;
 }
 
@@ -112,7 +124,6 @@ void CheckCRC(char *filename){
 int main(int argc, char* argv[]){
     setlocale(LC_ALL, "Russian_Russia");
     crc_init();
-    CheckCRC(argv[1]);
-    //HandleFolder(argv[1], 1);
+    
     return (0);
 }
