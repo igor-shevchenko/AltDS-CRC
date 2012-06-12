@@ -5,7 +5,8 @@
 #include "crc.h"
 
 const int BUF_SIZE = 1024;
-const char APPENDIX[5] = ":crc\0";
+const char APPENDIX[] = ":crc\0";
+const char USAGE[] = "Usage: %s [check|write] [FILENAME|FOLDER] [-r]\n";
 
 void HandleFolder(char *name, char recursive, void (*func)(char *)){
     WIN32_FIND_DATA FindFileData;
@@ -89,7 +90,6 @@ void WriteCRC(char *filename){
             printf("Unable to write to %s\n", streamFilename);
             exit(-1);
         }
-        
     } else {
         printf("Unable to open %s\n", streamFilename);
         exit(-1);
@@ -117,13 +117,28 @@ void CheckCRC(char *filename){
         }        
     } else {
         printf("%s changed\n", filename);
-        exit(-1);
     }
 }
 
 int main(int argc, char* argv[]){
     setlocale(LC_ALL, "Russian_Russia");
     crc_init();
-    
+    if (argc > 1){
+        void (*f)(char *);
+        char recursive = 0; 
+        if (!strcmp(argv[1], "check"))
+            f = CheckCRC;
+        else if (!strcmp(argv[1], "write"))
+            f = WriteCRC;
+        else {
+            printf(USAGE, argv[0]);
+            return(0);
+        }
+        if (argc > 3 && !strcmp(argv[3], "-r"))
+            recursive = 1;
+        HandleFolder(argv[2], recursive, f);
+    } else {
+        printf(USAGE, argv[0]);
+    }
     return (0);
 }
