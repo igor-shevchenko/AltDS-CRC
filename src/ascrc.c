@@ -14,10 +14,8 @@ void HandleFolder(char *name, char recursive, void (*func)(char *)){
     DWORD dwError;
     hFind = FindFirstFile(name, &FindFileData);
     if (hFind == INVALID_HANDLE_VALUE){
-        if (hFind == INVALID_HANDLE_VALUE){
-            printf("Invalid file handle. Error is %u\n", GetLastError());
-            exit (-1);
-        }
+    	printf("Invalid file handle. Error is %u\n", GetLastError());
+        exit (-1);
     }
     if (! (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
         func(name);
